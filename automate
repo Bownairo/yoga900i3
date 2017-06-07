@@ -1,36 +1,36 @@
 #!/bin/bash
 
-regex1="<([^<>]*)>"
-regex2="<([^<>]*)>.*<([^<>\.]*)\."
+regex1="changed: (.*)"
+regex2="changed: (.*)\."
 
-gdbus monitor --system --dest net.hadess.SensorProxy | while read -r line; do
+monitor-sensor | while read -r line; do
 	if [[ $line =~ $regex1 ]]; then
 		case ${BASH_REMATCH[1]} in
-			"'left-up'")
+			"left-up")
 				if [ $(cat ~/.config/i3/rotatelock) -eq 0 ]; then
 					flip left
 					fi
 				;;
-			"'right-up'")
+			"right-up")
 				if [ $(cat ~/.config/i3/rotatelock) -eq 0 ]; then
 					flip right
 				fi
 				;;
-			"'bottom-up'")
+			"bottom-up")
 				if [ $(cat ~/.config/i3/rotatelock) -eq 0 ]; then
 					flip up
 					fi
 				;;
-			"'normal'")
+			"normal")
 				if [ $(cat ~/.config/i3/rotatelock) -eq 0 ]; then
 					flip down
 					fi
 				;;
-			"'lux'")
+			*)
 				if [ $(cat ~/.config/i3/brightnesslock) -eq 0 ]; then
 					[[ $line =~ $regex2 ]]
-					xbacklight -set $((${BASH_REMATCH[2]} / 10 + 20)) -steps 500
-				fi
+					xbacklight -set $((${BASH_REMATCH[1]} / 10 + 20)) -steps 500
+					fi
 				;;
 		esac
 	fi

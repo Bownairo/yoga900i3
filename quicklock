@@ -1,2 +1,2 @@
 #!/bin/bash
-/usr/bin/i3lock -ue -p default -i /home/eero/Pictures/Background.png
+/usr/bin/i3lock -e -i /home/eero/Pictures/Background.png

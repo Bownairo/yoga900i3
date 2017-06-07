@@ -6,7 +6,7 @@ if [ "$(pidof i3)" != "" ]; then
 	mkfifo $OUT
 	scrot $IN &
 	convert $IN -blur 0x5 $OUT &
-	i3lock -ue -p default -i $OUT
+	i3lock -e -i $OUT
 	rm $IN
 	rm $OUT
 fi

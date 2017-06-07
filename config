@@ -136,7 +136,8 @@ bindsym $mod+Shift+c reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
-bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+#bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+# ME use a fancy jank menu
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
@@ -146,10 +147,15 @@ mode "resize" {
         # Pressing right will grow the window’s width.
         # Pressing up will shrink the window’s height.
         # Pressing down will grow the window’s height.
-        bindsym j resize shrink width 10 px or 10 ppt
-        bindsym k resize grow height 10 px or 10 ppt
-        bindsym l resize shrink height 10 px or 10 ppt
-        bindsym semicolon resize grow width 10 px or 10 ppt
+        #bindsym j resize shrink width 10 px or 10 ppt
+        #bindsym k resize grow height 10 px or 10 ppt
+        #bindsym l resize shrink height 10 px or 10 ppt
+        #bindsym semicolon resize grow width 10 px or 10 ppt
+	# ME vim controls
+	bindsym h resize shrink width 10 px or 10 ppt
+	bindsym k resize grow height 10 px or 10 ppt
+	bindsym j resize shrink height 10 px or 10 ppt
+	bindsym l resize grow width 10 px or 10 ppt
 
         # same bindings, but for the arrow keys
         bindsym Left resize shrink width 10 px or 10 ppt
@@ -168,12 +174,14 @@ bindsym $mod+r mode "resize"
 # finds out, if available)
 bar {
         status_command i3status | ~/.config/i3status/wrapper.py
+	output eDP-1
 }
 
 # MY THINGS
 
-# Natural Scrolling
-exec --no-startup-id xinput --set-prop 10 280 1 
+# Natural Scrolling and better speed
+exec --no-startup-id xinput set-prop "SYNA2B29:00 06CB:77C6" "libinput Natural Scrolling Enabled" 1
+exec --no-startup-id xinput set-prop "SYNA2B29:00 06CB:77C6" "libinput Accel Speed" .2
 
 # Gaps
 gaps inner 10
@@ -183,7 +191,7 @@ gaps outer 5
 exec --no-startup-id compton -CGb --backend glx --vsync opengl
 
 # Background
-exec --no-startup-id feh --bg-scale ~/Pictures/Background.jpg
+exec --no-startup-id ~/.fehbg
 
 # i3 Lock
 bindsym $mod+z exec --no-startup-id lock
@@ -204,7 +212,10 @@ bindsym XF86MonBrightnessDown exec --no-startup-id "xbacklight -dec 10 && echo '
 bindsym $mod+P exec --no-startup-id "echo '0' > ~/.config/i3/brightnesslock && killall -USR1 i3status"
 
 # Touchpad
-bindsym XF86TouchpadToggle exec --no-startup-id chrome
+bindsym XF86TouchpadToggle exec --no-startup-id toggletouchpad
+
+# Chrome
+bindsym $mod+period exec google-chrome --force-device-scale-factor=1.25
 
 # Dropbox
 exec --no-startup-id dropbox start
@@ -214,10 +225,9 @@ assign [class="Franz"] 3
 exec --no-startup-id franz
 
 # Bluetooth
-exec --no-startup-id blueman-applet
-exec --no-startup-id rfkill block bluetooth
+exec --no-startup-id "rfkill unblock bluetooth && blueman-applet & sleep 5 && rfkill block bluetooth"
 bindsym XF86WLAN exec --no-startup-id "if [ $(cat /sys/class/rfkill/rfkill0/soft) -eq 0 ]; then rfkill unblock bluetooth; else rfkill block bluetooth; fi"
-bindsym $mod+shift+B exec --no-startup-id "if [ $(cat /sys/class/rfkill/rfkill1/soft) -eq 1 ]; then rfkill unblock bluetooth; else rfkill block bluetooth; fi"
+bindsym $mod+B exec --no-startup-id "if [ $(cat /sys/class/rfkill/rfkill1/soft) -eq 1 ]; then rfkill unblock bluetooth; else rfkill block bluetooth; fi"
 
 # Rotation Lock
 bindsym $mod+O exec --no-startup-id "if [ $(cat ~/.config/i3/rotatelock) -eq 0 ]; then echo '1' > ~/.config/i3/rotatelock; else echo '0' > ~/.config/i3/rotatelock; fi && killall -USR1 i3status"
@@ -230,3 +240,22 @@ exec --no-startup-id ~/.config/i3/automate
 
 # Switcher button
 bindsym mod1+control+Tab exec --no-startup-id dmenu_run
+
+# Power Menu
+set $powerMenu "Menu | [p]ower off | [r]eboot | [l]ogout | [h]ibernate"
+
+mode $powerMenu {
+	bindsym p exec --no-startup-id systemctl poweroff
+	bindsym r exec --no-startup-id systemctl reboot
+	bindsym l exit
+	bindsym h exec --no-startup-id systemctl hibernate; mode "default"
+
+	bindsym Return mode "default"
+	bindsym Escape mode "default"
+}
+
+bindsym $mod+Shift+e mode $powerMenu
+
+#Scratchpad for music
+bindsym $mod+minus move scratchpad
+bindsym $mod+equal scratchpad show
