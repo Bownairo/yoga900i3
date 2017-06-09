@@ -1,5 +1,5 @@
 set global termcmd "gnome-terminal -e"
-set global ycmd_path /home/eero/Build/ycmd/ycmd/
+#set global ycmd_path /home/eero/Build/ycmd/ycmd/
 
 hook global WinSetOption filetype=c %{
     	#clang-enable-autocomplete
@@ -12,13 +12,32 @@ hook global WinSetOption filetype=c %{
 }
 
 hook global WinCreate .* %{
-	addhl number_lines
+    addhl number_lines
 }
 
+set global scrolloff 3,5
+
 set global tabstop 4
+hook global InsertChar \t %{
+    try %{
+        exec -draft h@hW<a-\;>L<a-k>\A<space>+\Z<ret>d
+    }
+}
 
 map global normal '#' :comment-line<ret>
 
-hook global InsertCompletionShow .* %{ map window insert <tab> <c-n>; map window insert <backtab> <c-p> }
-hook global InsertCompletionHide .* %{ unmap window insert <tab> <c-n>; unmap window insert <backtab> <c-p> }
+#hook global InsertCompletionShow .* %{ map window insert <tab> <c-n>; map window insert <backtab> <c-p> }
+#hook global InsertCompletionHide .* %{ unmap window insert <tab> <c-n>; unmap window insert <backtab> <c-p> }
 
+map global insert <backspace> '<a-;>:insert-bs<ret>'
+
+decl -hidden int minusone 3
+
+def -hidden insert-bs %{
+    try %{
+        # delete indentwidth spaces before cursor
+        exec -itersel -draft -no-hooks h %opt{minusone}H <a-k>\A<space>+\Z<ret> d
+    } catch %{
+        exec <backspace>
+    }
+}
