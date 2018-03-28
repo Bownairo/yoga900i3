@@ -1,12 +1,15 @@
 #!/bin/bash
 if [ "$(pidof i3)" != "" ]; then
-	IN=/tmp/lockinpipe.png
-	OUT=/tmp/lockoutpipe.png
-	mkfifo $IN
-	mkfifo $OUT
-	scrot $IN &
-	convert $IN -blur 0x5 $OUT &
-	i3lock -e -i $OUT
-	rm $IN
-	rm $OUT
+        if [ "$(pidof i3lock)" == "" ]; then
+                IN=/tmp/lockinpipe.png
+                OUT=/tmp/lockoutpipe.png
+                mkfifo $IN
+                # Fix because imagemagick stopped respecting fifos
+                #mkfifo $OUT
+                scrot $IN &
+                convert $IN -blur 0x5 $OUT &&   # Fix because imagemagick stopped respecting fifos
+                i3lock -e -i $OUT
+                rm $IN
+                rm $OUT
+        fi
 fi
